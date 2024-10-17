@@ -1,0 +1,117 @@
+version: "3.7"
+services:
+  redpanda:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --smp 1
+      - --memory 1G
+      - --mode dev-container
+      - --default-log-level=debug
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.7
+    container_name: redpanda
+    ports:
+      - "18081:18081"
+      - "18082:18082"
+      - "19092:19092"
+      - "19644:9644"
+  console:
+    container_name: redpanda-console
+    image: docker.redpanda.com/vectorized/console:v2.2.3
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda:9092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda:9644"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redpanda
+  jobmanager:
+    build: .
+    container_name: jobmanager
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    volumes:
+      - ./jars/:/opt/flink/jars
+      - ./logs/flink/:/opt/flink/temp
+      - ./data/:/opt/flink/data
+      - ./scripts/:/opt/flink/scripts
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 2048m
+        parallelism.default: 1
+        rest.flamegraph.enabled: true
+
+  taskmanager1:
+    build: .
+    container_name: taskmanager1
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    volumes:
+      - ./logs/flink/:/opt/flink/temp
+      - ./data/:/opt/flink/data
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.memory.process.size: 2048m
+        taskmanager.numberOfTaskSlots: 5
+        parallelism.default: 1
+        rest.flamegraph.enabled: true
+  taskmanager2:
+    build: .
+    container_name: taskmanager2
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    volumes:
+      - ./logs/flink/:/opt/flink/temp
+      - ./data/:/opt/flink/data
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.memory.process.size: 2048m
+        taskmanager.numberOfTaskSlots: 5
+        parallelism.default: 1
+        rest.flamegraph.enabled: true
+
+  postgres:
+    image: debezium/postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+  mysql:
+    image: debezium/example-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
