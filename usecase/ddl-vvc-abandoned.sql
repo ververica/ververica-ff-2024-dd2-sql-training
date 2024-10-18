@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `system`.deepdive2.abandoned (
     'connector' = 'kafka',
     'topic' = '${secret_values.dd_user}.abandoned',
     'format' = 'json',
-    'properties.bootstrap.servers' = '${secret_values.dd_kafka_uri}',
+    'properties.bootstrap.servers' = '${secret_values.dd_kafka_uri}:9092',
     'properties.group.id' = '${secret_values.dd_user}.group.abandoned',
     'key.format' = 'raw',
     'key.fields' = 'user_id',

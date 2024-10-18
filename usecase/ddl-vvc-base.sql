@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS events (
     'connector' = 'kafka',
     'topic' = '${secret_values.dd_user}.events',
     'format' = 'json',
-    'properties.bootstrap.servers' = '${secret_values.dd_kafka_uri}',
+    'properties.bootstrap.servers' = '${secret_values.dd_kafka_uri}:9092',
     'key.format' = 'raw',
     'key.fields' = 'user_id',
     'scan.startup.mode' = 'group-offsets',
