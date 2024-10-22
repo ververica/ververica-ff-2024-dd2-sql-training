@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `system`.deepdive2.events_clean;
 CREATE TABLE IF NOT EXISTS `system`.deepdive2.events_clean WITH (
     'connector' = 'kafka',
     'topic' = '${secret_values.dd_user}.events_clean',

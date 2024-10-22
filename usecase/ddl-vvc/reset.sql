@@ -1,0 +1,8 @@
+USE CATALOG `system`;
+USE deepdive2;
+
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS events_clean;
+DROP TABLE IF EXISTS abandoned;

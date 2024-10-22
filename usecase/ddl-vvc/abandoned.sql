@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `system`.deepdive2.abandoned;
 CREATE TABLE IF NOT EXISTS `system`.deepdive2.abandoned (
     user_id INT,
     full_name STRING,

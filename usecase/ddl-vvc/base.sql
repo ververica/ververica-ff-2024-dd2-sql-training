@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS deepdive2;
 USE deepdive2;
 
 -- Would also work: CREATE TABLE `default`.dd.events
+DROP TABLE IF EXISTS events;
 CREATE TABLE IF NOT EXISTS events (
     event_time TIMESTAMP(3),
     event_type STRING,
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS events (
 --  - timestamp: start from user-supplied timestamp for each partition.
 --  - specific-offsets: start from user-supplied specific offsets for each partition.
 
+DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
     id INT,
     first_name STRING,
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS users (
   'table-name' = 'users'
 );
 
+DROP TABLE IF EXISTS products;
 CREATE TABLE IF NOT EXISTS products (
     id INT,
     `name` STRING,

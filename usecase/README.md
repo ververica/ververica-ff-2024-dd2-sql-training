@@ -23,7 +23,10 @@ And create your session cluster with minimal configuration.
     <img src="../assets/usecase.png">
 </p>
 
-On VVC run `ddl-vvc-base.sql`.
+On VVC run `ddl-vvc/base.sql`.
+
+__NOTE__: This README creates tables once needed.  
+You can directly run `ddl-vvc-all.sql` and create every table required as well.
 
 > UI exploration on VVC: catalogs and tables...
 
